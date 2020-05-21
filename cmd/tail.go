@@ -44,11 +44,15 @@ var tailCmd = &cobra.Command{
 			outputRecords = append(outputRecords, inputRecord)
 
 			if len(outputRecords) > tailRecordCount {
-				outputRecords = outputRecords[len(outputRecords)-tailRecordCount:len(outputRecords)]
+				outputRecords = outputRecords[len(outputRecords)-tailRecordCount:]
 			}
 		}
 
-		csvWriter.WriteAll(outputRecords)
+		err = csvWriter.WriteAll(outputRecords)
+		if err != nil {
+			log.Fatal().Err(err).Msg("error flushing CSV writer")
+		}
+
 		csvWriter.Flush()
 	},
 }
