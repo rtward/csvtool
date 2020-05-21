@@ -36,7 +36,7 @@ func init() {
 	cobra.OnInitialize(func() {
 		logWriter := zerolog.ConsoleWriter{Out: os.Stderr}
 		logWriter.FormatLevel = func(i interface{}) string {
-			return strings.ToUpper(fmt.Sprintf("jdev-%s", i))
+			return strings.ToUpper(fmt.Sprintf("csvtool-%s", i))
 		}
 
 		log.Logger = log.Output(logWriter)

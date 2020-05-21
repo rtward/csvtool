@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-var recordCount int
+var headRecordCount int
 
 var headCmd = &cobra.Command{
 	Use:   "head",
@@ -18,7 +18,7 @@ var headCmd = &cobra.Command{
 		csvWriter := csv.NewWriter(os.Stdout)
 
 		// Iterate through the file, and take recordCount + 1 lines, to account for the header
-		for lineNum :=0; lineNum <= recordCount; lineNum++  {
+		for lineNum :=0; lineNum <= headRecordCount; lineNum++  {
 			inputRecord, err := csvReader.Read()
 			if err == io.EOF { break }
 			if err != nil {
@@ -39,6 +39,6 @@ var headCmd = &cobra.Command{
 }
 
 func init() {
-	headCmd.Flags().IntVarP(&recordCount, "number", "n", 10, "the amount of lines (excluding the header) that should be taken from the head of the input")
+	headCmd.Flags().IntVarP(&headRecordCount, "number", "n", 10, "the amount of lines (excluding the header) that should be taken from the head of the input")
 	rootCmd.AddCommand(headCmd)
 }
