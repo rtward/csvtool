@@ -17,8 +17,13 @@ var headCmd = &cobra.Command{
 		csvReader := csv.NewReader(os.Stdin)
 		csvWriter := csv.NewWriter(os.Stdout)
 
-		// Iterate through the file, and take recordCount + 1 lines, to account for the header
-		for lineNum :=0; lineNum <= headRecordCount; lineNum++  {
+		hasHeader, err := cmd.Root().PersistentFlags().GetBool("header")
+		if err != nil { log.Fatal().Err(err).Msg("error reading header command option") }
+
+		numRecords := headRecordCount
+		if hasHeader { numRecords += 1 }
+		// Iterate through the file, and take recordCount + 1 lines, to account for the hasHeader
+		for lineNum :=0; lineNum < numRecords; lineNum++  {
 			inputRecord, err := csvReader.Read()
 			if err == io.EOF { break }
 			if err != nil {
