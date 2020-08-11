@@ -17,18 +17,23 @@ var tailCmd = &cobra.Command{
 		csvReader := csv.NewReader(os.Stdin)
 		csvWriter := csv.NewWriter(os.Stdout)
 
-		headerRecord, err := csvReader.Read()
-		if err != nil {
-			log.Fatal().
-				Err(err).
-				Msg("error reading CSV header")
-		}
-		err = csvWriter.Write(headerRecord)
-		if err != nil {
-			log.Fatal().
-				Err(err).
-				Strs("headerRecord", headerRecord).
-				Msg("error writing CSV header")
+		hasHeader, err := cmd.Root().PersistentFlags().GetBool("header")
+		if err != nil { log.Fatal().Err(err).Msg("error reading header command option") }
+
+		if hasHeader {
+			headerRecord, err := csvReader.Read()
+			if err != nil {
+				log.Fatal().
+					Err(err).
+					Msg("error reading CSV header")
+			}
+			err = csvWriter.Write(headerRecord)
+			if err != nil {
+				log.Fatal().
+					Err(err).
+					Strs("headerRecord", headerRecord).
+					Msg("error writing CSV header")
+			}
 		}
 
 		outputRecords := make([][]string, 0)

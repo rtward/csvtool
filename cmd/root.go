@@ -47,5 +47,6 @@ func init() {
 	})
 
 	rootCmd.PersistentFlags().CountVarP(&verboseCount, "verbose", "v", "Print additional logging info, may be used multiple times")
+	rootCmd.PersistentFlags().Bool("header", true, "Treat the first line of the CSV as a header")
 }
 
