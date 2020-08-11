@@ -1,39 +1,22 @@
 package cmd
 
 import (
-	"encoding/csv"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"io"
-	"os"
 )
-
-var tailRecordCount int
 
 var tailCmd = &cobra.Command{
 	Use:   "tail",
 	Short: "Select some number of records from the beginning of a CSV file",
 	Run: func(cmd *cobra.Command, args []string) {
-		csvReader := csv.NewReader(os.Stdin)
-		csvWriter := csv.NewWriter(os.Stdout)
-
-		hasHeader, err := cmd.Root().PersistentFlags().GetBool("header")
-		if err != nil { log.Fatal().Err(err).Msg("error reading header command option") }
+		recordCount, err := cmd.Flags().GetInt("number")
+		if err != nil { log.Fatal().Err(err).Msg("error reading number argument") }
 
 		if hasHeader {
-			headerRecord, err := csvReader.Read()
-			if err != nil {
-				log.Fatal().
-					Err(err).
-					Msg("error reading CSV header")
-			}
-			err = csvWriter.Write(headerRecord)
-			if err != nil {
-				log.Fatal().
-					Err(err).
-					Strs("headerRecord", headerRecord).
-					Msg("error writing CSV header")
-			}
+			log.Debug().Strs("header", header).Msg("writing header row")
+			err = csvWriter.Write(header)
+			if err != nil { log.Fatal().Err(err).Msg("error writing CSV header") }
 		}
 
 		outputRecords := make([][]string, 0)
@@ -48,21 +31,17 @@ var tailCmd = &cobra.Command{
 
 			outputRecords = append(outputRecords, inputRecord)
 
-			if len(outputRecords) > tailRecordCount {
-				outputRecords = outputRecords[len(outputRecords)-tailRecordCount:]
+			if len(outputRecords) > recordCount {
+				outputRecords = outputRecords[len(outputRecords)-recordCount:]
 			}
 		}
 
 		err = csvWriter.WriteAll(outputRecords)
-		if err != nil {
-			log.Fatal().Err(err).Msg("error flushing CSV writer")
-		}
-
-		csvWriter.Flush()
+		if err != nil { log.Fatal().Err(err).Msg("error writing output records") }
 	},
 }
 
 func init() {
-	tailCmd.Flags().IntVarP(&tailRecordCount, "number", "n", 10, "the amount of lines (excluding the header) that should be taken from the end of the input")
+	tailCmd.Flags().IntP("number", "n", 10, "the amount of lines (excluding the header) that should be taken from the end of the input")
 	rootCmd.AddCommand(tailCmd)
 }
