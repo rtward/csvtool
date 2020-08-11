@@ -14,13 +14,17 @@ func writeSelectedColumns(selectedColumns []int, csvWriter *csv.Writer, inputRec
 		useColumn := false
 
 		// If we don't list any columns, take all of them
-		if len(selectedColumns) == 0 { useColumn = true }
+		if len(selectedColumns) == 0 {
+			useColumn = true
+		}
 
 		// If we do have some selected columns, then see if any of them match our current record index
 		for selectedColumnIdx := range selectedColumns {
 			selectedColumn := selectedColumns[selectedColumnIdx]
 			// And if they do, then we'll take that column
-			if selectedColumn == inputColumnIdx { useColumn = true }
+			if selectedColumn == inputColumnIdx {
+				useColumn = true
+			}
 		}
 
 		if useColumn {
@@ -41,7 +45,9 @@ func writeSelectedColumns(selectedColumns []int, csvWriter *csv.Writer, inputRec
 
 func getSelectedColumns(cmd *cobra.Command) []int {
 	columnsByNum, err := cmd.Flags().GetIntSlice("columns")
-	if err != nil { log.Fatal().Err(err).Msg("error reading columns argument") }
+	if err != nil {
+		log.Fatal().Err(err).Msg("error reading columns argument")
+	}
 
 	if len(columnsByNum) > 0 {
 		log.Debug().Ints("selectedColumns", columnsByNum).Msg("got columns from columns arg")
@@ -49,14 +55,18 @@ func getSelectedColumns(cmd *cobra.Command) []int {
 	}
 
 	columnsByName, err := cmd.Flags().GetStringSlice("column-names")
-	if err != nil { log.Fatal().Err(err).Msg("error reading columnn-names argument") }
+	if err != nil {
+		log.Fatal().Err(err).Msg("error reading columnn-names argument")
+	}
 
 	if len(columnsByName) == 0 {
 		log.Debug().Msg("no columns arg provided, defaulting to all columns")
 		return nil
 	}
 
-	if !hasHeader { log.Fatal().Msg("cannot use column-names with CSV without a header") }
+	if !hasHeader {
+		log.Fatal().Msg("cannot use column-names with CSV without a header")
+	}
 
 	selectedColumns := make([]int, len(columnsByName))
 	for selectedColumnIdx := range columnsByName {
@@ -71,7 +81,12 @@ func getSelectedColumns(cmd *cobra.Command) []int {
 			}
 		}
 
-		if !found { log.Fatal().Str("column", columnName).Msg("unable to find column in the CSV header") }
+		if !found {
+			log.Fatal().
+				Strs("header", header).
+				Str("column", columnName).
+				Msg("unable to find column in the CSV header")
+		}
 	}
 
 	log.Debug().Ints("selectedColumns", selectedColumns).Msg("got columns from column-names arg")
@@ -91,8 +106,12 @@ var cutCmd = &cobra.Command{
 
 		for {
 			inputRecord, err := csvReader.Read()
-			if err == io.EOF { break }
-			if err != nil { log.Fatal().Err(err).Msg("error parsing CSV") }
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatal().Err(err).Msg("error parsing CSV")
+			}
 
 			writeSelectedColumns(selectedColumns, csvWriter, inputRecord)
 		}

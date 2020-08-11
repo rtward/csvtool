@@ -11,18 +11,24 @@ var headCmd = &cobra.Command{
 	Short: "Select some number of records from the beginning of a CSV file",
 	Run: func(cmd *cobra.Command, args []string) {
 		recordCount, err := cmd.Flags().GetInt("number")
-		if err != nil { log.Fatal().Err(err).Msg("error reading number argument") }
+		if err != nil {
+			log.Fatal().Err(err).Msg("error reading number argument")
+		}
 
 		if hasHeader {
 			log.Debug().Strs("header", header).Msg("writing header row")
 			err = csvWriter.Write(header)
-			if err != nil { log.Fatal().Err(err).Msg("error writing CSV header") }
+			if err != nil {
+				log.Fatal().Err(err).Msg("error writing CSV header")
+			}
 		}
 
 		// Iterate through the file, and take recordCount + 1 lines, to account for the hasHeader
-		for lineNum :=0; lineNum < recordCount; lineNum++  {
+		for lineNum := 0; lineNum < recordCount; lineNum++ {
 			inputRecord, err := csvReader.Read()
-			if err == io.EOF { break }
+			if err == io.EOF {
+				break
+			}
 			if err != nil {
 				log.Fatal().Err(err).Msg("error parsing CSV")
 			}

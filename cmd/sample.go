@@ -14,12 +14,16 @@ var sampleCmd = &cobra.Command{
 	Short: "Select a random sampling of lines from a CSV file",
 	Run: func(cmd *cobra.Command, args []string) {
 		recordCount, err := cmd.Flags().GetInt("number")
-		if err != nil { log.Fatal().Err(err).Msg("error reading number argument") }
+		if err != nil {
+			log.Fatal().Err(err).Msg("error reading number argument")
+		}
 
 		if hasHeader {
 			log.Debug().Strs("header", header).Msg("writing header row")
 			err = csvWriter.Write(header)
-			if err != nil { log.Fatal().Err(err).Msg("error writing CSV header") }
+			if err != nil {
+				log.Fatal().Err(err).Msg("error writing CSV header")
+			}
 		}
 
 		// Implementation of the resivoir sampling algorithm from: https://en.wikipedia.org/wiki/Reservoir_sampling
@@ -44,12 +48,12 @@ var sampleCmd = &cobra.Command{
 		if !eof {
 			// Generate an inital random seed
 			rand.Seed(time.Now().UnixNano())
-			w := math.Exp(math.Log(rand.Float64())/float64(recordCount))
+			w := math.Exp(math.Log(rand.Float64()) / float64(recordCount))
 
 			// Now go through the rest of the items, maybe swapping them out for one
 			for {
 				// Calculate a random number of items to skip
-				skip := int(math.Floor(math.Log(rand.Float64())/math.Log(1-w)))
+				skip := int(math.Floor(math.Log(rand.Float64()) / math.Log(1-w)))
 				for i := 0; i < skip; i++ {
 					_, err := csvReader.Read()
 					if err == io.EOF {
@@ -75,7 +79,9 @@ var sampleCmd = &cobra.Command{
 		}
 
 		err = csvWriter.WriteAll(outputRecords)
-		if err != nil { log.Fatal().Err(err).Msg("error writing output records") }
+		if err != nil {
+			log.Fatal().Err(err).Msg("error writing output records")
+		}
 	},
 }
 
